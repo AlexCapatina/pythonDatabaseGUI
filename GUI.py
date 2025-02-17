@@ -5,38 +5,76 @@ from table_operations import TableOperations
 
 
 class pythonDB:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("Student records")
-        self.root.geometry("800x600")
+    def __init__(self):
+        super().__init__()
+        self.title("Student records")
+        self.geometry("800x600")
 
-        self.database = None
-        self.student_ops = None
+        self.container = tk.Frame(self)
+        self.container.pack(fill="both", expand=True)
 
-        # User and password inputs
-        tk.Label(root, text="Username: ").pack()
-        self.username_entry = tk.Entry(root)
+        self.frames = {}
+
+        for Frs in (LoginScreen, DatabaseSelectorScreen, MainTableScreen):
+            frame = Frs(self.container, self)
+            self.frames[Frs] = frame
+            frame.grid(row=0, column=0, sticly="nsew")
+
+        self.show_frame(LoginScreen)
+
+        def show_frame(self, frame_class):
+            frame = self.frames[frame_class]
+            frame.tkraise()
+
+        # self.database = None
+        # self.student_ops = None
+
+class LoginScreen(tk.Frame):
+    def __init__(self, mainFrame, controller):
+        super().__init__(mainFrame)
+        self.controller = controller
+
+        tk.Label(self, text="Username: ").pack()
+        self.username_entry = tk.Entry(self)
         self.username_entry.pack()
 
-        tk.Label(root, text="Password: ").pack()
-        self.password_entry = tk.Entry(root, show="*")
+        tk.Label(self, text="Password: ").pack()
+        self.password_entry = tk.Entry(self, show="*")
         self.password_entry.pack()
 
+        tk.Button(self, text="Login", command=self.login).pack()
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+
+        if username and password:
+            self.controller.username = username
+            self.controller.password = password
+            self.controller.show_frame(DatabaseSelectorScreen)
+        else:
+            messagebox.showerror("Error", "Please enter both username and password")
+
+
+class DatabaseSelectorScreen(tk.Frame):
+    def __init__(self, mainFrame, controller):
+        super().__init__(mainFrame)
+        self.controller = controller
+
         # Database drop down manu
-        tk.Label(root, text="Select database: ").pack()
+        tk.Label(self, text="Select database: ").pack()
         self.database_var = tk.StringVar()
-        self.database_dropdown = ttk.Combobox(root, textvariable=self.database_var, state="readonly")
+        self.database_dropdown = ttk.Combobox(self, textvariable=self.database_var, state="readonly")
         self.database_dropdown.pack()
 
-        self.return_database_button = tk.Button(root, text="Return database", command=self.load_database)
+        self.return_database_button = tk.Button(self, text="Return database", command=self.load_database)
         self.return_database_button.pack()
 
         # Display table
-        self.tree = ttk.Treeview(root)
+        self.tree = ttk.Treeview(self)
         self.tree.pack(expand=True, fill="both")
 
         # CRUD buttons
-        frame = tk.Frame(root)
+        frame = tk.Frame(self)
         frame.pack(pady=10)
 
         labels = ["Name", "Branch", "Roll", "Section", "Age"]

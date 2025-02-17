@@ -22,8 +22,8 @@ class TableOperations:
 
     def insert_record(self, values):
         try:
-            query = "INSERT INTO STUDENT(NAME, BRANCH, ROLL, SECTION, AGE) VALUES (%s, %s, %s, %s, %s)"
-            self.cursor.execute(query, values)
+            queryInsert = "INSERT INTO STUDENT(NAME, BRANCH, ROLL, SECTION, AGE) VALUES (%s, %s, %s, %s, %s)"
+            self.cursor.execute(queryInsert, values)
             self.database.connection.commit()
             messagebox.showinfo("Success", "Record inserted successfully")
         except Exception as e:
@@ -31,8 +31,8 @@ class TableOperations:
 
     def update_record(self, values):
         try:
-            query = "UPDATE STUDENT SET NAME=%s, BRANCH=%s, SECTION=%s, AGE=%s WHERE ROLL=%s"
-            self.cursor.execute(query, (values[0], values[1], values[3], values[4], values[2]))
+            queryUpdate = "UPDATE STUDENT SET NAME=%s, BRANCH=%s, SECTION=%s, AGE=%s WHERE ROLL=%s"
+            self.cursor.execute(queryUpdate, (values[0], values[1], values[3], values[4], values[2]))
             self.database.connection.commit()
             messagebox.showinfo("Success", "Record updated successfully")
         except Exception as e:
@@ -40,8 +40,8 @@ class TableOperations:
 
     def delete_record(self, roll_number):
         try:
-            query = "DELETE FROM STUDENT WHERE ROLL=%s"
-            self.cursor.execute(query, (roll_number,))
+            queryDelete = "DELETE FROM STUDENT WHERE ROLL=%s"
+            self.cursor.execute(queryDelete, (roll_number,))
             self.database.connection.commit()
             messagebox.showinfo("Success", "Record deleted successfully")
         except Exception as e:
