@@ -36,12 +36,33 @@ class pythonDB:
         self.tree.pack(expand=True, fill="both")
 
         # CRUD buttons
-        btn_frame = tk.Frame(root)
-        btn_frame.pack(pady=10)
+        frame = tk.Frame(root)
+        frame.pack(pady=10)
 
-        tk.Button(btn_frame, text="Insert", command=self.insert_record, width=12).grid(row=0, column=0, padx=5)
-        tk.Button(btn_frame, text="Update", command=self.update_record, width=12).grid(row=0, column=1, padx=5)
-        tk.Button(btn_frame, text="Delete", command=self.delete_record, width=12).grid(row=0, column=2, padx=5)
+        labels = ["Name", "Branch", "Roll", "Section", "Age"]
+        self.entries = {}
+
+        for i, labels in enumerate(labels):
+            tk.Label(frame, text=labels).grid(row=0, column=i)
+            entry = tk.Entry(frame, width=12)
+            entry.grid(row=1, column=i)
+            self.entries[labels] = entry
+
+        tk.Button(frame, text="Insert", command=self.insert_record, width=12).grid(row=0, column=0, padx=5)
+        tk.Button(frame, text="Update", command=self.update_record, width=12).grid(row=0, column=1, padx=5)
+        tk.Button(frame, text="Delete", command=self.delete_record, width=12).grid(row=0, column=2, padx=5)
+
+    def connect_database(self):
+        if not self.database_var.get():
+            messagebox.showerror("Error", "Please select a database first")
+            return
+
+        self.database = Database(self.username_entry.get(), self.password_entry.get(), self.database_var.get())
+        self.student_ops = TableOperations(self.database)
+        messagebox.showinfo("Success", f"Connected to {self.database_var.get()} successfully")
+
+        # self.load_database()
+        self.load_table()
 
     def load_database(self):
         if not self.username_entry.get() or not self.password_entry.get():
@@ -56,28 +77,74 @@ class pythonDB:
         else:
             messagebox.showerror("Error", "No databases found or incorrect credentials!")
 
-        return_database_button = tk.Button(root, text="Return databases", command=self.load_database)
-        return_database_button.pack()
+        if not hasattr(self, "return_database_button"):
+            return_database_button = tk.Button(self.root, text="Return databases", command=self.load_database)
+            return_database_button.pack()
 
-    def connect_database(self):
-        self.database = Database(self.username_entry.get(), self.password_entry.get(), self.database_var.get())
-        self.student_ops = TableOperations(self.database)
-        messagebox.showinfo("Success", "Connected to database successfully")
+        if not hasattr(self, "connect_button"):
+            self.connect_button = tk.Button(self.root, text="Connect to Database", command=self.connect_database)
+            self.connect_button.pack()
+
+    def load_table(self):
+        rows, columns = self.student_ops.get_table_data()
+
+        if not self.student_ops:
+            messagebox.showerror("Error", "Not connected to any database")
+            return
+
+        if not rows:
+            messagebox.showwarning("Warning", "No records found in STUDENT table")
+
+        self.tree["columns"] = columns
+        self.tree["show"] = "headings"
+
+        for col in columns:
+            self.tree.heading(col, text=col)
+            self.tree.column(col, width=100)
+
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        for row in rows:
+            self.tree.insert("", "end", values=row)
 
     def insert_record(self):
-        values = ["John", "CS", "101", "A", "20"]
+        values = [self.entries[label].get() for label in ["Name", "Branch", "Roll", "Section", "Age"]]
+        if not values[2].isdigit():
+            messagebox.showerror("Error", "Roll number must be a valid integer.")
+            return
+        values[2] = int(values[2])
         self.student_ops.insert_record(values)
 
+        self.load_table()
+
     def update_record(self):
-        values = ["John Doe", "IT", "101", "B", "21"]
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showerror("Error", "Select record to update")
+            return
+
+        values = [self.entries[label].get() for label in ["Name", "Branch", "Roll", "Section", "Age"]]
+        if not values[2].isdigit():
+            messagebox.showerror("Error", "Roll number must be a valid integer.")
+            return
+
         self.student_ops.update_record(values)
 
+        self.load_table()
+
     def delete_record(self):
-        roll_number = "101"
+        selected_item = self.tree.selection()
+        if not selected_item:
+            messagebox.showerror("Error", "Select record to delete")
+            return
+        values = self.tree.item(selected_item, "values")
+        roll_number = values[2]
+
         self.student_ops.delete_record(roll_number)
+        self.load_table()
 
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    app = pythonDB(root)
-    root.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     app = pythonDB(root)
+#     root.mainloop()

@@ -4,33 +4,48 @@ from tkinter import messagebox
 
 class Database:
     def __init__(self, user, password, database):
-        try:
-            self.conn = mysql.connector.connect(
-                host="localhost",
-                user=user,
-                password=password,
-                database=database
-            )
-            self.cursor = self.conn.cursor()
-            print("Connected to database successfully!")
-        except mysql.connector.Error as error:
-            messagebox.showerror("Error", f"Database connection failed: {error}")
+        self.user = user
+        self.password = password
+        self.database = database
+        self.connection = None
+        self.cursor = None
 
-    def get_databases(self, user, password):
-        try:
-            temp_conn = mysql.connector.connect(
-                host="localhost",
-                user=user,
-                password=password
-            )
-            temp_cursor = temp_conn.cursor()
-            temp_cursor.execute("SHOW DATABASES")
-            databases = [db[0] for db in temp_cursor.fetchall()]
-            temp_conn.close()
-            return databases
-        except mysql.connector.Error as error:
-            messagebox.showerror("Error", f"Could not fetch databases: {error}")
-            return[]
+        self.connect()
 
-    def close(self):
-        self.conn.close()
+    def connect(self):
+        try:
+            self.connection = mysql.connector.connect(
+                host="localhost",
+                user=self.user,
+                password=self.password,
+                database=self.database
+            )
+            print("Connected to database successfully")
+
+            self.cursor = self.connection.cursor()
+        except mysql.connector.Error as error:
+            print(f"Error connecting to database: {error}")
+            self.connection = None
+            self.cursor = None
+
+    def get_databases(self):
+        # try:
+        #     conn = mysql.connector.connect(
+        #         host="localhost",
+        #         user=self.user,
+        #         password=self.password
+        #     )
+        if not self.connection:
+            return []
+
+        # cursor = self.connection.cursor()
+        self.cursor.execute("SHOW DATABASES")
+        return [db[0] for db in self.cursor.fetchall()]
+        # conn.close()
+        return databases
+        # except mysql.connector.Error as error:
+        #     messagebox.showerror("Error", f"Could not fetch databases: {error}")
+        #     return[]
+
+    # def close(self):
+    #     self.conn.close()
