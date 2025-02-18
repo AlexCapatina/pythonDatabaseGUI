@@ -8,7 +8,7 @@ class pythonDB(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Student records")
-        self.geometry("800x600")
+        self.geometry("1000x600")
 
         self.container = tk.Frame(self)
         self.container.pack(fill="both", expand=True)
