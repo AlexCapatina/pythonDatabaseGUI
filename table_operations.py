@@ -6,13 +6,21 @@ class TableOperations:
     def __init__(self, database):
         self.database = database
         self.cursor = self.database.connection.cursor()
+        self.table_name = None
+
+    def set_table(self, table_name):
+        self.table_name = table_name
 
     def get_table_data(self):
+        if not self.table_name:
+            print("No table selected")
+            return [], []
+
         try:
-            self.cursor.execute("SELECT * FROM STUDENT")
+            self.cursor.execute(f"SELECT * FROM {self.table_name}")
             rows = self.cursor.fetchall()
 
-            self.cursor.execute("SHOW COLUMNS FROM STUDENT")
+            self.cursor.execute(f"SHOW COLUMNS FROM {self.table_name}")
             columns = [col[0] for col in self.cursor.fetchall()]
             return rows, columns
 
