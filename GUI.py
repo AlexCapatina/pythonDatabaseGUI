@@ -59,7 +59,7 @@ class DatabaseSelectionWindow(tk.Frame):
         super().__init__(mainFrame)
         self.controller = controller
 
-        # Database drop down manu
+        # Database dropdown menu
         tk.Label(self, text="Select database: ").pack()
         self.database_var = tk.StringVar()
         self.database_dropdown = ttk.Combobox(self, textvariable=self.database_var, state="readonly")
@@ -70,6 +70,16 @@ class DatabaseSelectionWindow(tk.Frame):
 
         self.connectButton = tk.Button(self, text="Connect", command=self.connect_database)
         self.connectButton.pack()
+
+        # Table dropdown menu
+        tk.Label(self, text="Select Table: ").pack()
+        self.table_var = tk.StringVar()
+        self.table_dropdown = ttk.Combobox(self, textvariable=self.table_var, state="readonly")
+        self.table_dropdown.pack()
+        self.table_dropdown["values"] = []
+
+        self.loadTableButton = tk.Button(self, text="Show Tables", command=self.load_selected_table)
+        self.loadTableButton.pack()
 
     def load_database(self):
         temporaryDB = Database(self.controller.username, self.controller.password, "")
@@ -85,15 +95,43 @@ class DatabaseSelectionWindow(tk.Frame):
         if not selectedDB:
             messagebox.showerror("Error", "Database not selected. Please select a database and then you can continue.")
             return
+
         self.controller.database = Database(self.controller.username, self.controller.password, selectedDB)
         self.controller.tableOperations = TableOperations(self.controller.database)
 
         messagebox.showinfo("Success", f"You are now connected to {selectedDB}")
 
-        tableWindow = self.controller.frames[tableScreen]
-        tableWindow.load_table()
+        # tableWindow = self.controller.frames[tableScreen]
+        # tableWindow.load_table()
+        #
+        # self.controller.show_frame(tableScreen)
 
-        self.controller.show_frame(tableScreen)
+        self.load_tables()
+
+        def load_tables(self):
+            if not self.controller.database:
+                messagebox.showerror("Error", "No database selected.")
+                return
+
+            cursor = self.controller.database.connection.cursor()
+            cursor.execute("SHOW TABLES")
+            tables = [table[0] for table in cursor.fetchall()]
+            cursor.close()
+
+            if tables:
+                self.table_dropdown["values"] = tables
+            else:
+                messagebox.showerror("Error", "No tables found.")
+
+        def load_selected_table(self):
+            selected_table = self.table_var.get()
+            if not selected_table:
+                messagebox.showerror("Error", "Please select a table.")
+                return
+
+            self.controller.tableOperations.set_table(selected_table)
+            self.controller.frames(TableScreen).load_table()
+            self.controller.show_frame(TableScreen)
 
 
 class tableScreen(tk.Frame):
