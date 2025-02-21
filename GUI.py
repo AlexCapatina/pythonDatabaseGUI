@@ -26,9 +26,6 @@ class pythonDB(tk.Tk):
         frame = self.frames[frame_class]
         frame.tkraise()
 
-        # self.database = None
-        # self.student_ops = None
-
 
 class LoginWindow(tk.Frame):
     def __init__(self, mainFrame, controller):
@@ -74,10 +71,6 @@ class DatabaseSelectionWindow(tk.Frame):
         self.connectButton = tk.Button(self, text="Connect", command=self.connect_database)
         self.connectButton.pack()
 
-        # Display table
-        # self.tree = ttk.Treeview(self)
-        # self.tree.pack(expand=True, fill="both")
-
     def load_database(self):
         temporaryDB = Database(self.controller.username, self.controller.password, "")
         databases = temporaryDB.get_databases()
@@ -86,17 +79,6 @@ class DatabaseSelectionWindow(tk.Frame):
             self.database_dropdown["values"] = databases
         else:
             messagebox.showerror("Error", "No databases elected or wrong login credentials")
-
-        # if not self.database_var.get():
-        #     messagebox.showerror("Error", "Please select a database first")
-        #     return
-
-        # self.database = Database(self.username_entry.get(), self.password_entry.get(), self.database_var.get())
-        # self.student_ops = TableOperations(self.database)
-        # messagebox.showinfo("Success", f"Connected to {self.database_var.get()} successfully")
-        #
-        # # self.load_database()
-        # self.load_table()
 
     def connect_database(self):
         selectedDB = self.database_var.get()
@@ -129,7 +111,6 @@ class tableScreen(tk.Frame):
         tk.Button(frameButton, text="Update", command=self.update_record, width=12).grid(row=0, column=1, padx=5)
         tk.Button(frameButton, text="Delete", command=self.delete_record, width=12).grid(row=0, column=2, padx=5)
 
-        # CRUD buttons
         self.entries = {}
         labels = ["Name", "Branch", "Roll", "Section", "Age"]
         inputBox = tk.Frame(self)
@@ -140,27 +121,6 @@ class tableScreen(tk.Frame):
             entry = tk.Entry(inputBox, width=12)
             entry.grid(row=1, column=i)
             self.entries[labels] = entry
-
-        # self.load_table()
-        # if not self.username_entry.get() or not self.password_entry.get():
-        #     messagebox.showerror("Error", "Please enter username and password first")
-        #     return
-        #
-        # db_temp = Database(self.username_entry.get(), self.password_entry.get(), "")
-        # databases = db_temp.get_databases()
-        #
-        # if databases:
-        #     self.database_dropdown["values"] = databases
-        # else:
-        #     messagebox.showerror("Error", "No databases found or incorrect credentials!")
-        #
-        # if not hasattr(self, "return_database_button"):
-        #     return_database_button = tk.Button(self.root, text="Return databases", command=self.load_database)
-        #     return_database_button.pack()
-        #
-        # if not hasattr(self, "connect_button"):
-        #     self.connect_button = tk.Button(self.root, text="Connect to Database", command=self.connect_database)
-        #     self.connect_button.pack()
 
     def load_table(self):
         rows, columns = self.controller.tableOperations.get_table_data()

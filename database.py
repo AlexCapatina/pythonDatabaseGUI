@@ -1,5 +1,4 @@
 import mysql.connector
-from tkinter import messagebox
 
 
 class Database:
@@ -29,23 +28,9 @@ class Database:
             self.cursor = None
 
     def get_databases(self):
-        # try:
-        #     conn = mysql.connector.connect(
-        #         host="localhost",
-        #         user=self.user,
-        #         password=self.password
-        #     )
         if not self.connection:
             return []
 
         # cursor = self.connection.cursor()
         self.cursor.execute("SHOW DATABASES")
         return [db[0] for db in self.cursor.fetchall()]
-        # conn.close()
-        return databases
-        # except mysql.connector.Error as error:
-        #     messagebox.showerror("Error", f"Could not fetch databases: {error}")
-        #     return[]
-
-    # def close(self):
-    #     self.conn.close()
