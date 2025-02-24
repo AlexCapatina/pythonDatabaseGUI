@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students</title>
+    <script src="{{url_for('static', filename='CRUDscript.js')}}"></script>
+</head>
+<body>
+    <h1>Student Records</h1>
+    <button onclick="getStudents()">Get table</button>
+    
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Branch</th>
+                <th>Roll</th>
+                <th>Section</th>
+                <th>Age</th>
+                <th>Functions</th>
+            </tr>
+        </thead>
+        <tbody id="student-table"></tbody>
+    </table>
+
+    <h2>Add record</h2>
+    <input type="text" id="name" placeholder="Name">
+    <input type="text" id="branch" placeholder="Branch">
+    <input type="number" id="roll" placeholder="Roll">
+    <input type="text" id="section" placeholder="Section">
+    <input type="number" id="age" placeholder="Age">
+    <button onclick="addStudent()">Add record</button>
+</body>
+</html>
