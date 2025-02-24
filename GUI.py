@@ -108,30 +108,30 @@ class DatabaseSelectionWindow(tk.Frame):
 
         self.load_tables()
 
-        def load_tables(self):
-            if not self.controller.database:
-                messagebox.showerror("Error", "No database selected.")
-                return
+    def load_tables(self):
+        if not self.controller.database:
+            messagebox.showerror("Error", "No database selected.")
+            return
 
-            cursor = self.controller.database.connection.cursor()
-            cursor.execute("SHOW TABLES")
-            tables = [table[0] for table in cursor.fetchall()]
-            cursor.close()
+        cursor = self.controller.database.connection.cursor()
+        cursor.execute("SHOW TABLES")
+        tables = [table[0] for table in cursor.fetchall()]
+        cursor.close()
 
-            if tables:
-                self.table_dropdown["values"] = tables
-            else:
-                messagebox.showerror("Error", "No tables found.")
+        if tables:
+            self.table_dropdown["values"] = tables
+        else:
+            messagebox.showerror("Error", "No tables found.")
 
-        def load_selected_table(self):
-            selected_table = self.table_var.get()
-            if not selected_table:
-                messagebox.showerror("Error", "Please select a table.")
-                return
+    def load_selected_table(self):
+        selected_table = self.table_var.get()
+        if not selected_table:
+            messagebox.showerror("Error", "Please select a table.")
+            return
 
-            self.controller.tableOperations.set_table(selected_table)
-            self.controller.frames(TableScreen).load_table()
-            self.controller.show_frame(TableScreen)
+        self.controller.tableOperations.set_table(selected_table)
+        self.load_tables()
+        self.controller.show_frame(tableScreen)
 
 
 class tableScreen(tk.Frame):
@@ -149,29 +149,37 @@ class tableScreen(tk.Frame):
         tk.Button(frameButton, text="Update", command=self.update_record, width=12).grid(row=0, column=1, padx=5)
         tk.Button(frameButton, text="Delete", command=self.delete_record, width=12).grid(row=0, column=2, padx=5)
 
-        self.entries = {}
-        labels = ["Name", "Branch", "Roll", "Section", "Age"]
-        inputBox = tk.Frame(self)
-        inputBox.pack(pady=10)
-
-        for i, labels in enumerate(labels):
-            tk.Label(inputBox, text=labels).grid(row=0, column=i)
-            entry = tk.Entry(inputBox, width=12)
-            entry.grid(row=1, column=i)
-            self.entries[labels] = entry
+        # self.entries = {}
+        # labels = ["Name", "Branch", "Roll", "Section", "Age"]
+        # inputBox = tk.Frame(self)
+        # inputBox.pack(pady=10)
+        #
+        # for i, labels in enumerate(labels):
+        #     tk.Label(inputBox, text=labels).grid(row=0, column=i)
+        #     entry = tk.Entry(inputBox, width=12)
+        #     entry.grid(row=1, column=i)
+        #     self.entries[labels] = entry
 
     def load_table(self):
-        rows, columns = self.controller.tableOperations.get_table_data()
-        self.tree["columns"] = columns
-        self.tree["show"] = "headings"
-
-        if not self.controller.tableOperations:
+        if not hasattr(self.controller, "tableOperations"):
             messagebox.showerror("Error", "Not connected to any database")
             return
 
+        rows, columns = self.controller.tableOperations.get_table_data()
         if not rows:
-            messagebox.showwarning("Warning", "No records found in STUDENT table")
+            messagebox.showinfo("Info", "No data in the table.")
             return
+
+        self.tree["columns"] = columns
+        self.tree["show"] = "headings"
+
+        # if not self.controller.tableOperations:
+        #     messagebox.showerror("Error", "Not connected to any database")
+        #     return
+        #
+        # if not rows:
+        #     messagebox.showwarning("Warning", "No records found in STUDENT table")
+        #     return
 
         for col in columns:
             self.tree.heading(col, text=col)
